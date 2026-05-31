@@ -1,0 +1,23 @@
+{
+  "name": "pos",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cloud POS system - web first, mobile later, multi-branch with cloud sync",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev --workspace=@pos/api",
+    "dev:web": "npm run dev --workspace=@pos/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build": "npm run build --workspace=@pos/web",
+    "db:generate": "npm run generate --workspace=@pos/db",
+    "db:migrate": "npm run migrate --workspace=@pos/db",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

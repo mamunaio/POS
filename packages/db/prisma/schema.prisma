@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Branch {
+  id        String   @id @default(uuid())
+  name      String
+  address   String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sales Sale[]
+
+  @@index([updatedAt])
+}
+
+model Product {
+  id         String   @id @default(uuid())
+  sku        String   @unique
+  barcode    String?  @unique
+  name       String
+  priceMinor Int
+  taxRateBps Int      @default(0)
+  stock      Int      @default(0)
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  saleItems SaleItem[]
+
+  @@index([updatedAt])
+  @@index([barcode])
+}
+
+model Sale {
+  // id is provided by the device (client-generated UUID) for offline safety
+  id            String   @id
+  branch        Branch   @relation(fields: [branchId], references: [id])
+  branchId      String
+  subtotalMinor Int
+  taxMinor      Int
+  totalMinor    Int
+  paymentMethod String
+  soldAt        DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  items SaleItem[]
+
+  @@index([branchId, updatedAt])
+  @@index([soldAt])
+}
+
+model SaleItem {
+  id             String  @id @default(uuid())
+  sale           Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  saleId         String
+  product        Product @relation(fields: [productId], references: [id])
+  productId      String
+  name           String
+  quantity       Int
+  unitPriceMinor Int
+  taxRateBps     Int
+
+  @@index([saleId])
+}
